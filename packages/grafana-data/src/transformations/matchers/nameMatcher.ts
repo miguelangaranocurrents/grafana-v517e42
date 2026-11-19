@@ -115,8 +115,14 @@ function fieldNameFallback(fields: Set<string>) {
       );
     };
   } else if (fields.has('Time') || fields.has('time')) {
+    // Only the legacy time column (named 'Time' or 'time') should be aliased. Matching every
+    // time-typed field would also match unrelated time fields such as 'created'.
     fallback = (field: Field, frame: DataFrame) => {
-      return frame.meta?.typeVersion == null && field.type === FieldType.time;
+      return (
+        frame.meta?.typeVersion == null &&
+        field.type === FieldType.time &&
+        (field.name === 'Time' || field.name === 'time')
+      );
     };
   }
 
